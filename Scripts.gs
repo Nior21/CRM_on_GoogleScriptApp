@@ -1,3 +1,5 @@
+// Я.Трекер - https://tracker.yandex.ru/agile/board/4
+
 function onEdit(event) {
   var Sheet = event.source.getActiveSheet().getSheetName()
   var Main = SpreadsheetApp.getActive().getSheetByName('Основная')
