@@ -1,0 +1,41 @@
+<script>
+$(function() {
+  $("table").removeAttr("border");
+  $("table").removeAttr("class");
+});
+
+
+// Validate
+function validate() {
+  var task = document.getElementById('taskId');
+  if (task.value != '') {
+    
+    //let response = await fetch("http://ra.grandexpert.ru:8080/redmine/issues/11265.xml?key=8dd2ec2b5a4f7988f4b8ecda370282296fc2176a");
+
+$.get('http://ra.grandexpert.ru:8080/redmine/issues/11265.xml?key=8dd2ec2b5a4f7988f4b8ecda370282296fc2176a', {query: '/'}, function(data) { 
+    console.log(data); // ответ от сервера
+})
+.success(function() { console.log('Успешное выполнение'); })
+.error(function(jqXHR) { console.log('Ошибка выполнения'); })
+.complete(function() { console.log('Завершение выполнения'); });
+    
+    return false;
+  }
+  alert("The values should be not blank");
+  return false;
+}
+
+
+//  window.addEventListener('load', function() {
+//  console.log('Page is loaded');
+//  });
+    
+  //document.getElementById("btn").addEventListener("click", doStuff);
+    
+  //function doStuff(){
+  //  google.script.run.userClicked();
+  //}
+  
+</script>
+
+
