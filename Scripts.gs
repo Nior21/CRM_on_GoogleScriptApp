@@ -48,12 +48,58 @@ function CreateTable() {
   }
   // Если выделены, то попробовать создать таблицу из них. Если нет то создать таблицу 2х2 ячейки, где первая строка заголовок
   else {
-    SpreadsheetApp.getActiveRange().offset(0, 0).setValue("test_header_1");
-    SpreadsheetApp.getActiveRange().offset(0, 1).setValue("test_header_2");
-    SpreadsheetApp.getActiveRange().offset(1, 0).setValue("test_value_1");
-    SpreadsheetApp.getActiveRange().offset(1, 1).setValue("test_value_2");
-    TableRange = SpreadsheetApp.getActiveRange().getA1Notation() /// собираем диапазон
-    Logger.log(SpreadsheetApp.getActiveRange().getA1Notation())
+    //SpreadsheetApp.getActiveRange().offset(0, 0).setValue("test_header_1");
+    //SpreadsheetApp.getActiveRange().offset(0, 1).setValue("test_header_2");
+    //SpreadsheetApp.getActiveRange().offset(1, 0).setValue("test_value_1");
+    //SpreadsheetApp.getActiveRange().offset(1, 1).setValue("test_value_2");
+    Logger.log(
+      "in:  " +
+      "SpreadsheetApp.getActiveRange().getRow()" +
+      "\n" +
+      "out: " + 
+      SpreadsheetApp.getActiveRange().getRow()
+    );
+    Logger.log(
+      "in:  " +
+      "SpreadsheetApp.getActiveRange().getColumn()" +
+      "\n" +
+      "out: " + 
+      SpreadsheetApp.getActiveRange().getColumn()
+    );
+    Logger.log(
+      "in:  " +
+      "SpreadsheetApp.getActiveRange().getLastRow()" +
+      "\n" +
+      "out: " + 
+      SpreadsheetApp.getActiveRange().getLastRow()
+    );
+    Logger.log(
+      "in:  " +
+      "SpreadsheetApp.getActiveRange().getLastColumns()" +
+      "\n" +
+      "out: " + 
+      SpreadsheetApp.getActiveRange().getLastColumn()
+    );
+    
+    TableRange = SpreadsheetApp.getActiveSheet().getRange(
+      SpreadsheetApp.getActiveRange().getRow(), // номер начальной строки
+      SpreadsheetApp.getActiveRange().getColumn(), // номер начальной колонки
+      2, // кол-во строк
+      2 // кол-во колонок
+      ); /// собираем диапазон
+      
+    Logger.log(
+      "in:  " +
+      "TableRange" +
+      "\n" +
+      "out: " + 
+      TableRange
+    );
+    
+    // собрали диапазон, требуется проверить дальнейшее его использование
+    
+    TableRange.setValue("1")
+    
   }
       
   // Создание именнованного диапазона
