@@ -81,12 +81,13 @@ function CreateTable() {
       SpreadsheetApp.getActiveRange().getLastColumn()
     );
     
-    TableRange = SpreadsheetApp.getActiveSheet().getRange(
+    // Собираем диапазон
+    TableRange = SpreadsheetApp.getActiveSheet().getRange( 
       SpreadsheetApp.getActiveRange().getRow(), // номер начальной строки
       SpreadsheetApp.getActiveRange().getColumn(), // номер начальной колонки
       2, // кол-во строк
       2 // кол-во колонок
-      ); /// собираем диапазон
+      );
       
     Logger.log(
       "in:  " +
