@@ -1,8 +1,11 @@
 /* По таймеру проводим проверку всех заявок на странице
 // Если есть пустая ячейка по которой должны быть данные, то вносим их
+// Если есть отличия в данных то заменять значения на значения из РМ (проводить проверку реже)
 // Функция проверки РМ и внесения данных должна запускаться отдельно от проверки по времени, напр. из функции onEdit()
 */
 function taskCosts() {
+
+  /* ИНИЦИАЛИЗИРУЕМ ОСНОВНЫЕ ВХОДЯЩИЕ ЗНАЧЕНИЯ */
  
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let settings_sheet = ss.getSheetByName('Настройки');
@@ -16,7 +19,8 @@ function taskCosts() {
   */
   
   // Получаем 55 строку с настройками
-  let settingsRange = settings_sheet.getRange(55, 1, 1, 5).getValues() // TODO: 55 надо заменить на название настройки "taskCost"
+  let settingsRange = settings_sheet.getRange(55, 1, 1, 5).getValues() // TODO: 55 надо заменить на поиск по названию "taskCost" / "TimeTrig"
+  // "Пазл" - хорошее название для настройки связей
   // В дальнейшем надо сделать чтобы самих настроек могло быть множество и все проверялись.
   // Т.е. надо избавиться от зависимости скрипта от самих настроек.
   Logger.log(settingsRange);
@@ -37,18 +41,26 @@ function taskCosts() {
     }
   }
 
-  // ПОЛУЧАЕМ АВТОМАТИЗИРОВАНО НОМЕР СТРОКИ И КОЛОНКИ УПОМЯНУТЫЕ В НАСТРОЙКАХ
+  /* ПОЛУЧАЕМ АВТОМАТИЗИРОВАНО НОМЕР СТРОКИ И КОЛОНКИ УПОМЯНУТЫЕ В НАСТРОЙКАХ */
   
-  let TableRange = ss.getRange(NameRange); Logger.log('TableRange:'+TableRange);
+  let TableRange = ss.getRange(NameRange); Logger.log('TableRange:' + TableRange);
   
   // Цикл для поиска колонки с нужным названием. По-умолчанию считаем что названия в первой строке диапазона.
-  for (i in TableRange) {}
+  let val = TableRange.getValues(); // Logger.log('val:' + val);
+  for (i in val[0]){
+    if (val[0][i] == ColumnName){
+      Logger.log('val:' + val[0][i] + " (" + i + ")");
+      var x = i + 1;
+    }
+  }
   
+  /* ВРУЧНУЮ ЗАДАЕМ НОМЕР СТРОКИ И КОЛОНКИ С ДАННЫМИ */
   let Row = 2 // TODO: Row вычисляем прямо в скрипте (? как-то указать только название таблицы и колонки)
   let Column = 9 // TODO: Column берется за счет поиска названия колонки в таблице
   
-  let taskCosts = main_sheet.getRange(Row, Column).getValue(); // сначала для одной ячейки
-  Logger.log(taskCosts);
+  // ПРОВЕРЯЕМ ЗНАЧЕНИЕ ЯЧЕЕК ГДЕ ДОЛЖНЫ БЫТЬ ДАННЫЕ И ВЫДАЕМ ЗНАЧЕНИЕ И BOOLEAN ЗНАЧЕНИЕ
+  
+  let taskCosts = main_sheet.getRange(Row, Column).getValue(); Logger.log('taskCosts' + taskCosts); // сначала для одной ячейки
 
 //  if (main_sheet == 'Основная' && Row > 1 && Column == 2) {
 //    Logger.log('Условие сработало')

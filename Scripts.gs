@@ -1,14 +1,68 @@
+// https://script.google.com/macros/s/AKfycbzYiJJIpOQ0VFxb1I-v6zuvdFvgwcak8P3Tg1JJ67V7NbJjFGkb/exec
+// https://script.google.com/macros/s/AKfycbzoWay5sXrNhPtLWc5E6f3W1RZKkhryt3owDHYjEwph/dev
+
 function onEdit(event) {
+
   var Sheet = event.source.getActiveSheet().getSheetName()
   var Main = SpreadsheetApp.getActive().getSheetByName('Основная')
+  var TestSheet = SpreadsheetApp.getActive().getSheetByName('ДляТестов')
   var Cell = SpreadsheetApp.getActive().getCurrentCell()
   var Row = Cell.getRow()
   var Column = Cell.getColumn()
   
+  // Условие 1
   if (Sheet == 'Основная' && Row > 1 && Column == 2) {
-    Logger.log('Условие сработало')
+    Logger.log('Условие 1 сработало')
     Organization()
   }
+  
+  // Условие 2
+  if (Sheet == 'ДляТестов' && Row > 1 && Column == 2) {
+    Logger.log('Условие 2 сработало')
+    EditTable() // Функция для работы с двумерными таблицами
+  }
+  
+}
+
+
+function EditTable() {    // Функция для работы с двумерными таблицами
+
+  // Добавление строк в конце таблицы
+  
+  // Адаптивный перенос строки после ввода значения в последней строке
+  
+  // Редактирование значений внутри таблицы ("растягивание" формул/условного форматирования/проверки данных/стиля ячейки по столбцам)
+  
+}
+
+function CreateTable() {
+
+  var TestSheet = SpreadsheetApp.getActive().getSheetByName('ДляТестов')
+  var Cell = SpreadsheetApp.getActive().getCurrentCell()
+  var Row = Cell.getRow()
+  var Column = Cell.getColumn()
+  var TableRange = SpreadsheetApp.getActiveRange()
+  
+  if (SpreadsheetApp.getActiveRange().getValue() == "test") {    // Проверка выделения ячеек
+    SpreadsheetApp.getActiveRange().setValue("true")
+  }
+  // Если выделены, то попробовать создать таблицу из них. Если нет то создать таблицу 2х2 ячейки, где первая строка заголовок
+  else {
+    SpreadsheetApp.getActiveRange().offset(0, 0).setValue("test_header_1");
+    SpreadsheetApp.getActiveRange().offset(0, 1).setValue("test_header_2");
+    SpreadsheetApp.getActiveRange().offset(1, 0).setValue("test_value_1");
+    SpreadsheetApp.getActiveRange().offset(1, 1).setValue("test_value_2");
+    TableRange = SpreadsheetApp.getActiveRange().getA1Notation() /// собираем диапазон
+    Logger.log(SpreadsheetApp.getActiveRange().getA1Notation())
+  }
+      
+  // Создание именнованного диапазона
+  //SpreadsheetApp.getActive().setNamedRange('Цены', Prices.getRange('A2:C' + NewRowInPrices))
+  
+  
+  // Создание фильтра
+  
+  // Проверка на "шапку" таблицы
 }
 
 function Organization() {
