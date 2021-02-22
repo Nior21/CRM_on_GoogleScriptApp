@@ -4,7 +4,8 @@
 
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Nior21/CRM_on_GoogleScriptApp">
 
-<img alt="Discord" src="https://img.shields.io/discord/812724054728638501?logo=discord">
+<a href="#" title="Discord">
+<img alt="Discord" src="https://img.shields.io/discord/812724054728638501?logo=discord"></a>
 
 <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/Nior21/CRM_on_GoogleScriptApp?style=social">
 </p>
