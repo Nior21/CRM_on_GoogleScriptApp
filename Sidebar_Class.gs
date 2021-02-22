@@ -54,8 +54,9 @@ class myButton {
      * @param title
      * @param scriptName
      * @param url
+     * @param listener
      */
-    constructor({title, scriptName, url}) {
+    constructor({title, scriptName, url, listener}) {
         this.title = title
         this.scriptName = scriptName
         this.url = url
@@ -66,7 +67,8 @@ class myButton {
             `myButton(
         title=${ this.title },
         scriptName=${ this.scriptName },
-        url=${ this.url }
+        url=${ this.url },
+        listener=${ this.listener }
         )`
         )
     }
