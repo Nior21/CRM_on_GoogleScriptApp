@@ -1,10 +1,9 @@
 /**
- * INIT CLASSES
+ * INIT SIDEBAR CLASS
  */
-
 class mySidebar {
     /**
-     * Класс mySidebar позволяет создавать сайдбары удобным способом с заранее сформулированными методами и свойства
+     * Класс mySidebar позволяет создавать sidebars удобным способом с заранее сформулированными методами и свойства
      * @param {object} json
      * @param {string} title - Sidebar name настроек которые надо удалить
      */
@@ -24,30 +23,65 @@ class mySidebar {
             }
             obj[key].log ()
         } )
-
     }
 
     log() {
         console.log (
             `mySidebar(
-        title=${ this.title },
-        json=${ JSON.stringify ( this.json ) }
-        )`
+                title=${ this.title },
+                json=${ JSON.stringify ( this.json ) }
+            )`
         )
     }
 
+
     /**
-     * Метод открывает 'sidebar'. Интерфейс описан в sidebar.html
+     * Метод открывает 'sidebar'.
      * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
      */
     show() {
         SpreadsheetApp.getUi ()
-            .showSidebar ( HtmlService.createTemplateFromFile ( 'Sidebar_Template' )
+            .showSidebar ( HtmlService
+                .createTemplateFromFile ( 'template_sidebar' )
                 .evaluate ()
                 .setTitle ( this.title ) );
     }
+
+    /**
+     * Метод позволяет сделать тест открытия 'sidebar'.
+     * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
+     */
+    test() {
+        const html = HtmlService.createTemplate (
+            "Hello, world! <input type=\"button\" value=\"Close\" onclick=\"google.script.host.close()\" />"
+        )
+            .evaluate ()
+            .setTitle ( "Test sidebar" )
+
+        SpreadsheetApp.getUi ()
+            .showSidebar ( HtmlService.createHtmlOutput ( html ) );
+    }
+
+    /**
+     * Метод открывает 'sidebar'.
+     * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
+     */
+    showInline() {
+        const Button = "<input type=\"button\" value=\"Close\" onclick=\"google.script.host.close()\" />"
+        const html = HtmlService.createTemplate (
+            Button
+        )
+            .evaluate ()
+            .setTitle ( "Test sidebar" )
+
+        SpreadsheetApp.getUi ()
+            .showSidebar ( HtmlService.createHtmlOutput ( html ) );
+    }
 }
 
+/**
+ * BUTTONS
+ */
 class myButton {
     /**
      * myButton
@@ -56,7 +90,7 @@ class myButton {
      * @param url
      * @param listener
      */
-    constructor({title, scriptName, url, listener}) {
+    constructor(title = null, scriptName = null, url = null, listener = null) {
         this.title = title
         this.scriptName = scriptName
         this.url = url
@@ -74,6 +108,9 @@ class myButton {
     }
 }
 
+/**
+ * INPUTS
+ */
 class myLabel {
     /**
      * myLabel
@@ -98,7 +135,6 @@ class myLabel {
 /**
  * TESTS
  */
-
 const json = {
     label: {
         title: "label",
@@ -117,6 +153,7 @@ function include(filename) {
 }
 
 const test = () => {
-    const Sidebar1 = new mySidebar(json)
-    return Sidebar1.show()
+    const Sidebar1 = new mySidebar ( json )
+    return Sidebar1.showInline ()
 }
+
