@@ -1,6 +1,7 @@
 /**
- * INIT SIDEBAR CLASS
+ * INIT CLASSES
  */
+
 class mySidebar {
     /**
      * Класс mySidebar позволяет создавать sidebars удобным способом с заранее сформулированными методами и свойства
@@ -10,41 +11,29 @@ class mySidebar {
     constructor(json, title = "Sidebar") {
         this.title = title
         this.json = json
+        this.html = ""
         const obj = []
         Object.keys ( json ).forEach ( (value, key) => {
-            //console.log(`json[${key}].${value}:`, json[value])
-            switch (value) {
-                case "label":
-                    obj[key] = new myLabel ( json[value] )
+            //console.log ( `json[${ key }].${ json[value].type }:`, json[value] )
+            switch (json[value].type) {
+                case "input":
+                    obj[key] = new Input ( json[value] )
                     break
                 case "button":
-                    obj[key] = new myButton ( json[value] )
+                    obj[key] = new Button ( json[value] )
                     break
             }
             obj[key].log ()
+            this.html += obj[key].getHtml () + "<br>\n"
+            //console.log ( this.html )
         } )
     }
 
     log() {
         console.log (
-            `mySidebar(
-              title=${ this.title },
-              json=${ JSON.stringify ( this.json ) }
-          )`
+            `title: ${ this.title },
+            json: ${ JSON.stringify ( this.json ) },`
         )
-    }
-
-
-    /**
-     * Метод открывает 'sidebar'.
-     * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
-     */
-    show() {
-        SpreadsheetApp.getUi ()
-            .showSidebar ( HtmlService
-                .createTemplateFromFile ( 'template_sidebar' )
-                .evaluate ()
-                .setTitle ( this.title ) );
     }
 
     /**
@@ -59,97 +48,144 @@ class mySidebar {
             .setTitle ( "Test sidebar" )
 
         SpreadsheetApp.getUi ()
-            .showSidebar ( HtmlService.createHtmlOutput ( html ) );
+            .showSidebar ( HtmlService.createHtmlOutput ( html ) )
     }
 
     /**
      * Метод открывает 'sidebar'.
      * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
      */
-    showInline() {
-        const Button = "<input type=\"button\" value=<?=value?> onclick=\"google.script.host.close()\" />"
-
-        let html = HtmlService.createTemplate(
-            Button + Button
-        )
-        html.value = "button"
-
-        html = html.evaluate().getContent()
-
-        SpreadsheetApp.getUi ().showSidebar ( HtmlService.createHtmlOutput(html) );
+    show() {
+        SpreadsheetApp.getUi ().showSidebar ( HtmlService
+            .createHtmlOutput ( this.html )
+            .setTitle ( this.title ) ); // создаем HtmlOutput
     }
 }
 
-/**
- * BUTTONS
- */
-class myButton {
+class Button {
     /**
-     * myButton
+     * Button class
      * @param title
-     * @param scriptName
-     * @param url
      * @param listener
+     * @param url
+     * @param child
      */
-    constructor(title = null, scriptName = null, url = null, listener = null) {
+    constructor({
+                    title = 'undefined_button',
+                    listener,
+                    url = 'undefined_url',
+                }) {
         this.title = title
-        this.scriptName = scriptName
+        this.listener = listener
         this.url = url
     }
 
+    getHtml() {
+        return HtmlService.createTemplate (
+            `<input type=\"button\" value=\"${ this.title }\" ${ this.listener } \\>`
+        ).evaluate ().getContent ()
+    }
+
     log() {
-        console.log (`myButton(
-            title=${ this.title },
-            scriptName=${ this.scriptName },
-            url=${ this.url },
-            listener=${ this.listener }
-        )`)
+        console.log (
+            `
+            title: ${ this.title },
+            url: ${ this.url },
+            listener: ${ this.listener },
+            `
+        )
     }
 }
 
-/**
- * INPUTS
- */
-class myLabel {
+class Input {
     /**
-     * myLabel
+     * Input class
      * @param title
      * @param listener
+     * @param child
      */
-    constructor({title, listener}) {
+    constructor({
+                    title = "input",
+                    listener
+                }) {
         this.title = title
         this.listener = listener
     }
 
+    getHtml() {
+        return HtmlService.createTemplate (
+            `<input type=\"input\" value=\"${ this.title }\" ${ this.listener } \\>`
+        ).evaluate ().getContent ()
+    }
+
     log() {
-        console.log (`myLabel(
-            title=${ this.title },
-            listener=${ this.listener }
-        )`)
+        console.log (
+            `
+            title: ${ this.title },
+            listener: ${ this.listener },
+            `
+        )
     }
 }
+
 
 /**
  * TESTS
  */
-const json = {
-    label: {
-        title: "label",
-        listener: "listener"
-    },
-    button: {
-        title: "button",
-        scriptName: "script",
-        url: "https://#"
-    },
-}
 
 const test = () => {
+    const json = [
+        {
+            type: "input",
+            title: "test_input"
+        },
+        {
+            type: "button",
+            title: "test_button",
+            listener: "onclick=\"google.script.host.close()\"",
+            url: "https://#"
+        },
+        {
+            type: "input",
+            title: "test_input"
+        },
+        {
+            type: "input",
+            title: "test_input"
+        },
+        {
+            type: "button",
+            title: "test_button",
+            listener: "onclick=\"google.script.host.close()\"",
+            url: "https://#"
+        },
+        {
+            type: "button",
+            title: "test_button",
+            listener: "onclick=\"google.script.host.close()\"",
+            url: "https://#"
+        },
+        {
+            type: "input",
+            title: "test_input",
+            spell: "fire"
+        },
+    ]
     const Sidebar1 = new mySidebar ( json )
-    return Sidebar1.showInline ()
+    return Sidebar1.show ()
 }
 
-function include(filename) {
+
+/**
+ * ANOTHER FUNCTION
+ */
+
+/**
+ * Include external files
+ * @param filename
+ * @returns {string}
+ */
+const include = (filename) => {
     return HtmlService.createHtmlOutputFromFile ( filename )
         .getContent ();
 }
