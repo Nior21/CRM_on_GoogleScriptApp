@@ -1,0 +1,38 @@
+<div>Count: </div>
+
+<input id="local_count" value=0 />
+<input type="button" value="Local Click" onclick="handlerLocalClick()">
+
+<input id="server_count" value=0 />
+<input
+  type="button"
+  value="ServerClick"
+  onclick="google.script.run
+    .withSuccessHandler(handlerServerClick)
+    .setCount()
+  "
+/>
+
+    
+<script>
+  function handlerLocalClick() {
+
+    let local_count = document.getElementById("local_count").value
+    
+    local_count = Number(local_count) + 1
+
+    document.getElementById("local_count").value = local_count
+
+    console.log(local_count)
+
+  }
+
+  function handlerServerClick(server_count) {
+
+    document.getElementById("server_count").value = server_count
+    
+    console.log(server_count)
+
+  }
+  
+</script>
