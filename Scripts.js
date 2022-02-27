@@ -11,7 +11,13 @@ class mySidebar {
     constructor(json, title = "Sidebar") {
         this.title = title
         this.json = json
-        this.html = ""
+        this.html =
+            "<script>\n" +
+            "   const handlerClick () {\n" +
+            "       console.log(\"Button clicked\")\n" +
+            "   } \n" +
+            "   google.script.run.withSuccessHandler(handlerClick).test_settings_log()\n" +
+            "</script>\n"
         const obj = []
         Object.keys ( json ).forEach ( (value, key) => {
             //console.log ( `json[${ key }].${ json[value].type }:`, json[value] )
@@ -25,20 +31,14 @@ class mySidebar {
             }
             obj[key].log ()
             this.html += obj[key].getHtml () + "<br>\n"
-            //console.log ( this.html )
+            console.log ( this.html )
         } )
-    }
-
-    log() {
-        console.log (
-            `title: ${ this.title },
-            json: ${ JSON.stringify ( this.json ) },`
-        )
     }
 
     /**
      * Метод позволяет сделать тест открытия 'sidebar'.
      * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
+     * https://developers.google.com/apps-script/guides/properties
      */
     test() {
         const html = HtmlService.createTemplate (
@@ -51,6 +51,13 @@ class mySidebar {
             .showSidebar ( HtmlService.createHtmlOutput ( html ) )
     }
 
+    log() {
+        console.log (
+            `title: ${ this.title },
+            json: ${ JSON.stringify ( this.json ) },`
+        )
+    }
+
     /**
      * Метод открывает 'sidebar'.
      * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
@@ -59,6 +66,42 @@ class mySidebar {
         SpreadsheetApp.getUi ().showSidebar ( HtmlService
             .createHtmlOutput ( this.html )
             .setTitle ( this.title ) ); // создаем HtmlOutput
+    }
+
+    /**
+     *  Функция записывает настройки указанные в полях ввода в Свойства проекта
+     *  https://developers.google.com/apps-script/reference/properties/properties?hl=en
+     *  @param {object} settings Список настроек которые надо сохранить
+     *  @return {boolean} True или False
+     */
+    setSettings(settings) {
+        for (let i = 0; i < settings.length; i++) {
+            PropertiesService.getDocumentProperties ().setProperty ( i, settings[i] );
+        }
+        return True;
+    }
+
+    /**
+     *  Метод получает конфигурацию html-формы Sidebar из Properties проекта
+     *  https://developers.google.com/apps-script/reference/properties/properties?hl=en
+     *  @return {object} properties_key Список настроек которые надо сохранить
+     */
+    getSettings() {
+        let properties_key = PropertiesService.getDocumentProperties ().getKeys ();
+        return console.log ( properties_key );
+    }
+
+    /**
+     *  Функция принудительной чистки ненужных данных из ScriptProperties
+     *  https://developers.google.com/apps-script/reference/properties/properties?hl=en
+     *  @param {object} settings Список настроек которые надо удалить
+     *  @return {boolean} True или False
+     */
+    deleteSettings(settings) {
+        for (let i = 0; i < settings.length; i++) {
+            ScriptProperties.deleteProperty ( "i" );
+        }
+        return True;
     }
 }
 
@@ -82,7 +125,7 @@ class Button {
 
     getHtml() {
         return HtmlService.createTemplate (
-            `<input type=\"button\" value=\"${ this.title }\" ${ this.listener } \\>`
+            `<input type=\"button\" value=\"${ this.title }\" ${ this.listener }>`
         ).evaluate ().getContent ()
     }
 
@@ -114,7 +157,7 @@ class Input {
 
     getHtml() {
         return HtmlService.createTemplate (
-            `<input type=\"input\" value=\"${ this.title }\" ${ this.listener } \\>`
+            `<input type=\"input\" value=\"${ this.title }\" ${ this.listener }>`
         ).evaluate ().getContent ()
     }
 
@@ -182,6 +225,8 @@ const test = () => {
 
 /**
  * Include external files
+ * https://developers.google.com/apps-script/guides/html/best-practices
+ * https://developers.google.com/apps-script/guides/html/templates#printing_scriptlets
  * @param filename
  * @returns {string}
  */
@@ -189,4 +234,3 @@ const include = (filename) => {
     return HtmlService.createHtmlOutputFromFile ( filename )
         .getContent ();
 }
-
