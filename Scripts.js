@@ -19,20 +19,20 @@ class mySidebar {
             "   google.script.run.withSuccessHandler(handlerClick).test_settings_log()\n" +
             "</script>\n"
         const obj = []
-        Object.keys ( json ).forEach ( (value, key) => {
+        Object.keys(json).forEach((value, key) => {
             //console.log ( `json[${ key }].${ json[value].type }:`, json[value] )
             switch (json[value].type) {
                 case "input":
-                    obj[key] = new Input ( json[value] )
+                    obj[key] = new Input(json[value])
                     break
                 case "button":
-                    obj[key] = new Button ( json[value] )
+                    obj[key] = new Button(json[value])
                     break
             }
-            obj[key].log ()
-            this.html += obj[key].getHtml () + "<br>\n"
-            console.log ( this.html )
-        } )
+            obj[key].log()
+            this.html += obj[key].getHtml() + "<br>\n"
+            console.log(this.html)
+        })
     }
 
     /**
@@ -41,18 +41,18 @@ class mySidebar {
      * https://developers.google.com/apps-script/guides/properties
      */
     test() {
-        const html = HtmlService.createTemplate (
-            "Hello, world! <input type=\"button\" value=\"Close\" onclick=\"google.script.host.close()\" />"
-        )
-            .evaluate ()
-            .setTitle ( "Test sidebar" )
+        const html = HtmlService.createTemplate(
+                "Hello, world! <input type=\"button\" value=\"Close\" onclick=\"google.script.host.close()\" />"
+            )
+            .evaluate()
+            .setTitle("Test sidebar")
 
-        SpreadsheetApp.getUi ()
-            .showSidebar ( HtmlService.createHtmlOutput ( html ) )
+        SpreadsheetApp.getUi()
+            .showSidebar(HtmlService.createHtmlOutput(html))
     }
 
     log() {
-        console.log (
+        console.log(
             `title: ${ this.title },
             json: ${ JSON.stringify ( this.json ) },`
         )
@@ -63,9 +63,9 @@ class mySidebar {
      * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
      */
     show() {
-        SpreadsheetApp.getUi ().showSidebar ( HtmlService
-            .createHtmlOutput ( this.html )
-            .setTitle ( this.title ) ); // создаем HtmlOutput
+        SpreadsheetApp.getUi().showSidebar(HtmlService
+            .createHtmlOutput(this.html)
+            .setTitle(this.title)); // создаем HtmlOutput
     }
 
     /**
@@ -76,7 +76,7 @@ class mySidebar {
      */
     setSettings(settings) {
         for (let i = 0; i < settings.length; i++) {
-            PropertiesService.getDocumentProperties ().setProperty ( i, settings[i] );
+            PropertiesService.getDocumentProperties().setProperty(i, settings[i]);
         }
         return True;
     }
@@ -87,8 +87,8 @@ class mySidebar {
      *  @return {object} properties_key Список настроек которые надо сохранить
      */
     getSettings() {
-        let properties_key = PropertiesService.getDocumentProperties ().getKeys ();
-        return console.log ( properties_key );
+        let properties_key = PropertiesService.getDocumentProperties().getKeys();
+        return console.log(properties_key);
     }
 
     /**
@@ -99,7 +99,7 @@ class mySidebar {
      */
     deleteSettings(settings) {
         for (let i = 0; i < settings.length; i++) {
-            ScriptProperties.deleteProperty ( "i" );
+            ScriptProperties.deleteProperty("i");
         }
         return True;
     }
@@ -114,23 +114,23 @@ class Button {
      * @param child
      */
     constructor({
-                    title = 'undefined_button',
-                    listener,
-                    url = 'undefined_url',
-                }) {
+        title = 'undefined_button',
+        listener,
+        url = 'undefined_url',
+    }) {
         this.title = title
         this.listener = listener
         this.url = url
     }
 
     getHtml() {
-        return HtmlService.createTemplate (
+        return HtmlService.createTemplate(
             `<input type=\"button\" value=\"${ this.title }\" ${ this.listener }>`
-        ).evaluate ().getContent ()
+        ).evaluate().getContent()
     }
 
     log() {
-        console.log (
+        console.log(
             `
             title: ${ this.title },
             url: ${ this.url },
@@ -148,21 +148,21 @@ class Input {
      * @param child
      */
     constructor({
-                    title = "input",
-                    listener
-                }) {
+        title = "input",
+        listener
+    }) {
         this.title = title
         this.listener = listener
     }
 
     getHtml() {
-        return HtmlService.createTemplate (
+        return HtmlService.createTemplate(
             `<input type=\"input\" value=\"${ this.title }\" ${ this.listener }>`
-        ).evaluate ().getContent ()
+        ).evaluate().getContent()
     }
 
     log() {
-        console.log (
+        console.log(
             `
             title: ${ this.title },
             listener: ${ this.listener },
@@ -172,65 +172,41 @@ class Input {
 }
 
 
-/**
- * TESTS
- */
 
-const test = () => {
-    const json = [
-        {
-            type: "input",
-            title: "test_input"
-        },
-        {
-            type: "button",
-            title: "test_button",
-            listener: "onclick=\"google.script.host.close()\"",
-            url: "https://#"
-        },
-        {
-            type: "input",
-            title: "test_input"
-        },
-        {
-            type: "input",
-            title: "test_input"
-        },
-        {
-            type: "button",
-            title: "test_button",
-            listener: "onclick=\"google.script.host.close()\"",
-            url: "https://#"
-        },
-        {
-            type: "button",
-            title: "test_button",
-            listener: "onclick=\"google.script.host.close()\"",
-            url: "https://#"
-        },
-        {
-            type: "input",
-            title: "test_input",
-            spell: "fire"
-        },
-    ]
-    const Sidebar1 = new mySidebar ( json )
-    return Sidebar1.show ()
+function onOpen() {
+    // Создаём новый пункт меню
+    SpreadsheetApp.getUi()
+        .createMenu("Sidebar")
+        .addItem("test", "test")
+        .addItem("showSidebar", "showSidebar")
+        .addItem("generateData", "generateData")
+        .addItem("clearData", "clearData")
+        .addToUi();
+    // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
+    // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
 }
 
+const myListener = ""
 
-/**
- * ANOTHER FUNCTION
- */
+const test_settings = new mySidebar(
+    [{
+            type: "input",
+            title: "test_input"
+        },
+        {
+            type: "button",
+            title: "get",
+            listener: "onclick=\"handlerClick\"",
+            url: "https://#"
+        },
+    ],
+    "Test Settings"
+)
 
-/**
- * Include external files
- * https://developers.google.com/apps-script/guides/html/best-practices
- * https://developers.google.com/apps-script/guides/html/templates#printing_scriptlets
- * @param filename
- * @returns {string}
- */
-const include = (filename) => {
-    return HtmlService.createHtmlOutputFromFile ( filename )
-        .getContent ();
+function showSidebar() {
+    test_settings.show()
+}
+
+function test_settings_log() {
+    console.log("test_settings_log run ok!")
 }
