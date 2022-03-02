@@ -93,7 +93,153 @@ function convert() {
   }
 }
 
+class mySidebar {
+  /**
+   * Класс mySidebar позволяет создавать sidebars удобным способом с заранее сформулированными методами и свойства
+   * @param {object} json
+   * @param {string} title - Sidebar name настроек которые надо удалить
+   */
+  constructor(title = "Sidebar", json) {
+    this.title = title,
+      this.json = json,
+      this.html =
+      "<script>\n" +
+      "   const handlerClick () {\n" +
+      "       console.log(\"Button clicked\")\n" +
+      "   } \n" +
+      "</script>\n"
+
+    const obj = []
+
+    Object.keys(json).forEach((value, key) => {
+      //console.log ( `json[${ key }].${ json[value].type }:`, json[value] )
+      switch (json[value].type) {
+        case "input":
+          obj[key] = new Input(json[value])
+          break
+        case "button":
+          obj[key] = new Button(json[value])
+          break
+      }
+      obj[key].log()
+      this.html += obj[key].getHtml() + "<br>\n"
+      console.log(this.html)
+    })
+  }
+
+  /**
+   * Метод открывает 'sidebar'.
+   * https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface
+   */
+  show() {
+    SpreadsheetApp.getUi().showSidebar(HtmlService
+      .createHtmlOutput(this.html)
+      .setTitle(this.title)); // создаем HtmlOutput
+  }
+
+  log() {
+    console.log(
+      `title: ${ this.title },
+            json: ${ JSON.stringify ( this.json ) },`
+    )
+  }
+}
+
+class Button {
+  /**
+   * Button class
+   * @param title
+   * @param listener
+   * @param url
+   * @param child
+   */
+  constructor({
+    title = 'undefined_button',
+    listener,
+    url = 'undefined_url',
+  }) {
+    this.title = title
+    this.listener = listener
+    this.url = url
+  }
+
+  getHtml() {
+    return HtmlService.createTemplate(
+      `<input type=\"button\" value=\"${ this.title }\" ${ this.listener }>`
+    ).evaluate().getContent()
+  }
+
+  log() {
+    console.log(
+      `
+            title: ${ this.title },
+            url: ${ this.url },
+            listener: ${ this.listener },
+            `
+    )
+  }
+}
+
+class Input {
+  /**
+   * Input class
+   * @param title
+   * @param listener
+   * @param child
+   */
+  constructor({
+    title = "input",
+    listener
+  }) {
+    this.title = title
+    this.listener = listener
+  }
+
+  getHtml() {
+    return HtmlService.createTemplate(
+      `<input type=\"input\" value=\"${ this.title }\" ${ this.listener }>`
+    ).evaluate().getContent()
+  }
+
+  log() {
+    console.log(
+      `
+            title: ${ this.title },
+            listener: ${ this.listener },
+            `
+    )
+  }
+}
+
+const myListener = ""
+
+const testSidebar = new mySidebar(
+  "Test Settings",
+  [{
+      type: "input",
+      title: "test_input"
+    },
+    {
+      type: "button",
+      title: "get",
+      listener: "onclick=\"handlerClick\"",
+      url: "https://#"
+    },
+  ]
+)
+
+function onOpen() {
+  // Создаём новый пункт меню
+  SpreadsheetApp.getUi()
+    .createMenu("Custom")
+    .addItem("test", "testSidebar.show")
+    .addToUi();
+  // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
+  // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
+}
+
 /** План
+ * [+] #1. Добавить меню и сайдбар
  * [-] Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
