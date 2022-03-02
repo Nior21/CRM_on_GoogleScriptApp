@@ -31,7 +31,7 @@ function getEmails_(query = 'in:inbox') {
       let inc_date = m.getDate()
       let timeZone = Session.getScriptTimeZone();
       let date = Utilities.formatDate(inc_date, timeZone, 'dd.MM.yyyy HH:mm:ss');
-      email.push([date]);
+      email.push([`mail [${date}]`]);
       // Вытягиваем отдельные данные и собираем в массиве mail
       const attachments = messages[j].getAttachments();
       for (let z = 0; z < attachments.length; z++) {
