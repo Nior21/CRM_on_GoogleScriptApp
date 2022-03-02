@@ -5,7 +5,7 @@ var SHEET_NAME = 'Почта';
 var QUERY = "in:inbox after:2022/03/02"
 
 /** Функция для одновременного запуска других функций и получения входного диапазона */
-function run() {
+function run_() {
   let array2d = getEmails_(QUERY);
   if (array2d) {
     var ss = SpreadsheetApp.openById(SHEET_ID);
@@ -26,16 +26,20 @@ function getEmails_(query = 'in:inbox') {
     const messages = thds[i].getMessages(); // Получаем список сообщений из каждого отдельного потока
     const email = [] // Инициируем массив сообщений
     for (let j in messages) { // Для каждого из списка сообщений в потоке отделяем отдельное письмо
-      messages[j].markRead(); // Для каждого сообщения указываем прочитанным
-      email.push([messages[j].getDate(), messages[j].getFrom(), messages[j].getAttachments()]);
+      let m = messages[j];
+      m.markRead(); // Для каждого сообщения указываем прочитанным
+      let inc_date = m.getDate()
+      let timeZone = Session.getScriptTimeZone();
+      let date = Utilities.formatDate(inc_date, timeZone, 'dd.MM.yyyy HH:mm:ss');
+      email.push([date]);
       // Вытягиваем отдельные данные и собираем в массиве mail
       const attachments = messages[j].getAttachments();
       for (let z = 0; z < attachments.length; z++) {
         let file = folder.createFile(attachments[z]);
 
-        Logger.log(file);
-        Logger.log(file.getMimeType())
-        Logger.log(file.getMimeType() == MimeType.MICROSOFT_EXCEL)
+        //Logger.log(file);
+        //Logger.log(file.getMimeType())
+        //Logger.log(file.getMimeType() == MimeType.MICROSOFT_EXCEL)
       }
     }
     emails = emails.concat(email); // Соединяем отдельные массивы в один двухмерный
@@ -50,7 +54,7 @@ function appendData_(sheet, array2d) {
 }
 
 /** Преобразуем файлы excel в формат google */
-function convert() {
+function convert_() {
   let files = DriveApp.getFilesByType(MimeType.MICROSOFT_EXCEL);
 
   while (files.hasNext()) {
@@ -78,15 +82,14 @@ function convert() {
       title: fileName,
     };
 
-    Logger.log(file.isTrashed());
+    //Logger.log(file.isTrashed());
     file.setTrashed(true);
-    Logger.log(file.isTrashed());
+    //Logger.log(file.isTrashed());
     file = Drive.Files.copy(file, sourceId, {
       convert: true
     });
   }
 }
-
 class mySidebar {
   /**
    * Класс mySidebar позволяет создавать sidebars удобным способом с заранее сформулированными методами и свойства
@@ -105,6 +108,10 @@ class mySidebar {
 
     const obj = []
 
+    if (typeof json == 'function') {
+      json = json();
+    }
+
     Object.keys(json).forEach((value, key) => {
       //console.log ( `json[${ key }].${ json[value].type }:`, json[value] )
       switch (json[value].type) {
@@ -114,10 +121,16 @@ class mySidebar {
         case "button":
           obj[key] = new Button(json[value])
           break
+        case "p":
+          obj[key] = new Paragraph(json[value])
+          break
+        case "ul":
+          obj[key] = new UnorderedList(json[value])
+          break
       }
-      obj[key].log()
+      //obj[key].log()
       this.html += obj[key].getHtml() + "<br>\n"
-      console.log(this.html)
+      //console.log(this.html)
     })
   }
 
@@ -138,7 +151,6 @@ class mySidebar {
     )
   }
 }
-
 class Button {
   /**
    * Button class
@@ -173,7 +185,6 @@ class Button {
     )
   }
 }
-
 class Input {
   /**
    * Input class
@@ -198,42 +209,92 @@ class Input {
   log() {
     console.log(
       `
-            title: ${ this.title },
-            listener: ${ this.listener },
-            `
+      title: ${ this.title },
+      listener: ${ this.listener },
+      `
+    )
+  }
+}
+class Paragraph {
+  /**
+   * Input class
+   * @param text
+   */
+  constructor({
+    text = "paragraph",
+  }) {
+    this.text = text
+  }
+
+  getHtml() {
+    return HtmlService.createTemplate(
+      `<p>${ this.text }</p>`
+    ).evaluate().getContent()
+  }
+
+  log() {
+    console.log(
+      `text: ${ this.text }`
+    )
+  }
+}
+class UnorderedList {
+  /**
+   * Input class
+   * @param array
+   */
+  constructor({
+    array = [],
+  }) {
+    this.array = array
+  }
+
+  getHtml() {
+    let resultHTML = '';
+    for (let i = 0; i < this.array.length; i++) {
+      if (i == 0) {
+        resultHTML += '<ul>';
+      }
+      resultHTML += '<li>' + this.array[i] + '</li>';
+      if (i == this.array.length - 1) {
+        resultHTML += '</ul>'
+      }
+    }
+    return HtmlService.createTemplate(resultHTML).evaluate().getContent()
+  }
+
+  log() {
+    console.log(
+      `array: ${ this.array }`
     )
   }
 }
 
 
-function importHTML(filename) {
+function importHTML_(filename) {
   return HtmlService.createHtmlOutputFromFile(filename)
     .getContent()
 }
 
 
-const myListener = ""
+//const myListener = ""
 
-const mailList = new mySidebar(
-  "Mail list",
-  [{
-      type: "input",
-      title: "test_input"
-    },
-    {
-      type: "button",
-      title: "get",
-      listener: "onclick=\"handlerClick\"",
-      url: "https://#"
-    },
-  ]
-)
+function generateMailSidebarJSON_() {
+  let mail2dArray = getEmails_(QUERY);
+
+  return [{
+    type: "ul",
+    array: mail2dArray
+  }];
+}
+
+const mailList = new mySidebar("Mail list", generateMailSidebarJSON_)
 
 function onOpen() {
   // Создаём новый пункт меню
   SpreadsheetApp.getUi()
-    .createMenu("Custom")
-    .addItem("Mail list", "mailList.show")
+    .createMenu("Дополнительно")
+    .addItem("Почта", "mailList.show")
     .addToUi();
   // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
   // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
@@ -247,4 +308,7 @@ function onOpen() {
  * setTrashed(trashed)
  * [-] Автоматическая разархивация файла
  * [-] Удаление файлов после конвертации
+ * [-] Переделать ul в select и сделать поле для отображения сообщений
+ * [-] Занести все доступные параметры сообщения в меню настройки, где можно выбрать что отображать
+ * [-] Добавить стили
  */
