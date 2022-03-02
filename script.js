@@ -213,8 +213,8 @@ class Input {
 
 const myListener = ""
 
-const testSidebar = new mySidebar(
-  "Test Settings",
+const mails = new mySidebar(
+  "Mail list",
   [{
       type: "input",
       title: "test_input"
@@ -232,7 +232,7 @@ function onOpen() {
   // Создаём новый пункт меню
   SpreadsheetApp.getUi()
     .createMenu("Custom")
-    .addItem("test", "testSidebar.show")
+    .addItem("mails", "mails.show")
     .addToUi();
   // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
   // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
@@ -241,9 +241,9 @@ function onOpen() {
 /** План
  * [+] #1. Добавить меню и сайдбар
  * [-] Добавить дату выгрузки файлов в названия
+ * [-] Нужно список сообщений с датами выводить в сайдбар
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
- * [-] Нужно список сообщений с датами выводить в сайдбар
  * [-] Автоматическая разархивация файла
  * [-] Удаление файлов после конвертации
  */
