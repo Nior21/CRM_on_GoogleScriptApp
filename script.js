@@ -45,12 +45,6 @@ function getEmails_(query = 'in:inbox') {
 }
 
 
-function appendAfter(range, array2d) {
-  range.clearContent();
-  range.setValues(array2d);
-}
-
-
 function appendData_(sheet, array2d) {
   array2d.length !== 0 ? sheet.getRange(sheet.getLastRow() + 1, 1, array2d.length, array2d[0].length).setValues(array2d) : ''
 }
@@ -211,9 +205,16 @@ class Input {
   }
 }
 
+
+function importHTML(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+    .getContent()
+}
+
+
 const myListener = ""
 
-const mails = new mySidebar(
+const mailList = new mySidebar(
   "Mail list",
   [{
       type: "input",
@@ -232,16 +233,16 @@ function onOpen() {
   // Создаём новый пункт меню
   SpreadsheetApp.getUi()
     .createMenu("Custom")
-    .addItem("mails", "mails.show")
+    .addItem("Mail list", "mailList.show")
     .addToUi();
   // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
   // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
 }
 
-/** План
+/** TODO:
  * [+] #1. Добавить меню и сайдбар
- * [-] Добавить дату выгрузки файлов в названия
- * [-] Нужно список сообщений с датами выводить в сайдбар
+ * [-] #2 Нужно список сообщений с датами выводить в сайдбар
+ * [-] #3. Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
  * [-] Автоматическая разархивация файла
