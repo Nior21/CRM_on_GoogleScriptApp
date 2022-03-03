@@ -31,7 +31,7 @@ function getEmails_(query = 'in:inbox') {
       let inc_date = m.getDate()
       let timeZone = Session.getScriptTimeZone();
       let date = Utilities.formatDate(inc_date, timeZone, 'dd.MM.yyyy HH:mm:ss');
-      email.push([`mail [${date}]`]);
+      email.push([`[${date}]`]);
       // Вытягиваем отдельные данные и собираем в массиве mail
       const attachments = messages[j].getAttachments();
       for (let z = 0; z < attachments.length; z++) {
@@ -53,43 +53,7 @@ function appendData_(sheet, array2d) {
   array2d.length !== 0 ? sheet.getRange(sheet.getLastRow() + 1, 1, array2d.length, array2d[0].length).setValues(array2d) : ''
 }
 
-/** Преобразуем файлы excel в формат google */
-function convert_() {
-  let files = DriveApp.getFilesByType(MimeType.MICROSOFT_EXCEL);
 
-  while (files.hasNext()) {
-    const source = files.next();
-    const sourceId = source.getId();
-    const fileName = source.getName().replace('.xlsx', '');
-
-    let file = {
-      title: fileName,
-    };
-
-    file = Drive.Files.copy(file, sourceId, {
-      convert: true
-    });
-  }
-
-  files = DriveApp.getFilesByType(MimeType.MICROSOFT_EXCEL_LEGACY);
-
-  while (files.hasNext()) {
-    const source = files.next();
-    const sourceId = source.getId();
-    const fileName = source.getName().replace('.xls', '');
-
-    let file = {
-      title: fileName,
-    };
-
-    //Logger.log(file.isTrashed());
-    file.setTrashed(true);
-    //Logger.log(file.isTrashed());
-    file = Drive.Files.copy(file, sourceId, {
-      convert: true
-    });
-  }
-}
 class mySidebar {
   /**
    * Класс mySidebar позволяет создавать sidebars удобным способом с заранее сформулированными методами и свойства
@@ -279,7 +243,7 @@ function importHTML_(filename) {
 
 //const myListener = ""
 
-function generateMailSidebarJSON_() {
+function generateMailsSidebarJSON_() {
   let mail2dArray = getEmails_(QUERY);
 
   return [{
@@ -288,13 +252,78 @@ function generateMailSidebarJSON_() {
   }];
 }
 
-const mailList = new mySidebar("Mail list", generateMailSidebarJSON_)
+/** Преобразуем файлы excel в формат google */
+function convert_() {
+  let files = DriveApp.getFilesByType(MimeType.MICROSOFT_EXCEL);
+
+  while (files.hasNext()) {
+    const source = files.next();
+    const sourceId = source.getId();
+    const fileName = source.getName().replace('.xlsx', '');
+
+    let file = {
+      title: fileName,
+    };
+
+    file = Drive.Files.copy(file, sourceId, {
+      convert: true
+    });
+  }
+
+  files = DriveApp.getFilesByType(MimeType.MICROSOFT_EXCEL_LEGACY);
+
+  while (files.hasNext()) {
+    const source = files.next();
+    const sourceId = source.getId();
+    const fileName = source.getName().replace('.xls', '');
+
+    let file = {
+      title: fileName,
+    };
+
+    //Logger.log(file.isTrashed());
+    file.setTrashed(true);
+    //Logger.log(file.isTrashed());
+    file = Drive.Files.copy(file, sourceId, {
+      convert: true
+    });
+  }
+}
+
+function getDriveFiles() {
+  let files = [];
+
+  let driveFiles = DriveApp.getFiles();
+
+  while (driveFiles.hasNext()) {
+    const source = driveFiles.next();
+    const sourceId = source.getId();
+    const fileName = source.getName().replace('.xls', '');
+
+    files.push([sourceId, fileName]);
+  }
+
+  return files;
+}
+
+function generateDriveSidebarJSON_() {
+  let files = getDriveFiles();
+
+  return [{
+    type: "ul",
+    array: files
+  }];
+}
+
+const mailsSidebar = new mySidebar("GMail", generateMailsSidebarJSON_)
+const driveSidebar = new mySidebar("Google Drive", generateDriveSidebarJSON_)
 
 function onOpen() {
   // Создаём новый пункт меню
   SpreadsheetApp.getUi()
     .createMenu("Дополнительно")
-    .addItem("Почта", "mailList.show")
+    .addItem("GMail", "mailsSidebar.show")
+    .addItem("Google Drive", "driveSidebar.show")
     .addToUi();
   // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
   // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
@@ -302,8 +331,9 @@ function onOpen() {
 
 /** TODO:
  * [+] #1. Добавить меню и сайдбар
- * [-] #2 Нужно список сообщений с датами выводить в сайдбар
- * [-] #3. Добавить дату выгрузки файлов в названия
+ * [+] #2 Нужно список сообщений с датами выводить в сайдбар
+ * [+] #3. Добавить список файлов
+ * [-] Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
  * [-] Автоматическая разархивация файла
