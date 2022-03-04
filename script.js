@@ -6,7 +6,7 @@ const QUERY = "in:inbox after:2022/03/02"
 
 /** Функция для одновременного запуска других функций и получения входного диапазона */
 function run_() {
-  let array2d = getEmails_(QUERY);
+  let array2d = getEmails(QUERY);
   if (array2d) {
     const ss = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);
@@ -16,7 +16,7 @@ function run_() {
 }
 
 /** Служебная часть функции получить письма с gmail */
-function getEmails_(query = 'in:inbox') {
+function getEmails(query = 'in:inbox') {
   const folder = DriveApp.getRootFolder(); // Здесь надо указать имя папки куда сохранять вложения
   // Итератор с папками
   let emails = []; // Создаем список адресов
@@ -244,7 +244,7 @@ function importHTML_(filename) {
 //const myListener = ""
 
 function generateMailsSidebarJSON_() {
-  let mail2dArray = getEmails_(QUERY);
+  let mail2dArray = getEmails(QUERY);
 
   return [{
     type: "ul",
@@ -329,12 +329,12 @@ function unZip() {
     if (zip.getMimeType() == MimeType.ZIP) {
       let unziped = Utilities.unzip(zip);
       for (let file of unziped) {
-        let name = file.getName();
-        let inc_date = file.getDateCreated();
+        let new_file = folder.createFile(file);
+        let name = new_file.getName();
+        let inc_date = new_file.getDateCreated();
         let timeZone = Session.getScriptTimeZone();
         let date = Utilities.formatDate(inc_date, timeZone, 'ddMMyyyyHHmmss');
-        file.setName(date + ' ' + name)
-        folder.createFile(file);
+        new_file.setName(date + ' ' + name);
       }
       zip.setTrashed(true);
     }
@@ -362,7 +362,7 @@ function onOpen() {
  * [+] #2. Нужно список сообщений с датами выводить в сайдбар
  * [+] #3. Добавить список файлов
  * [+] #4. Получить разархивированные файлы
- * [-] #5. Добавить дату выгрузки файлов в названия
+ * [+] #5. Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
  * [-] Автоматическая разархивация файла
