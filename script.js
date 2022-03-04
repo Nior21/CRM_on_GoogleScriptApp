@@ -1,15 +1,15 @@
-var SHEET_ID = '1PIUT5GSTyJxLZNByDY6bSTvgu7UzkXpqZkBBBMnefcM';
-var SHEET_NAME = 'Почта';
+const SHEET_ID = '1PIUT5GSTyJxLZNByDY6bSTvgu7UzkXpqZkBBBMnefcM';
+const SHEET_NAME = 'Почта';
 
 //Gmail Advanced search https://support.google.com/mail/answer/7190
-var QUERY = "in:inbox after:2022/03/02"
+const QUERY = "in:inbox after:2022/03/02"
 
 /** Функция для одновременного запуска других функций и получения входного диапазона */
 function run_() {
   let array2d = getEmails_(QUERY);
   if (array2d) {
-    var ss = SpreadsheetApp.openById(SHEET_ID);
-    var sheet = ss.getSheetByName(SHEET_NAME);
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
     appendData_(sheet, array2d);
   }
@@ -290,7 +290,8 @@ function convert_() {
   }
 }
 
-function getDriveFiles() {
+
+function getDriveFiles_() {
   let files = [];
 
   let driveFiles = DriveApp.getFiles();
@@ -298,7 +299,7 @@ function getDriveFiles() {
   while (driveFiles.hasNext()) {
     const source = driveFiles.next();
     const sourceId = source.getId();
-    const fileName = source.getName().replace('.xls', '');
+    const fileName = source.getName();
 
     files.push([sourceId, fileName]);
   }
@@ -307,13 +308,34 @@ function getDriveFiles() {
 }
 
 function generateDriveSidebarJSON_() {
-  let files = getDriveFiles();
+  let files = getDriveFiles_();
 
   return [{
     type: "ul",
     array: files
   }];
 }
+
+
+/** Разархивирование 
+ * @param { array } files
+ * @returns { array } unZipFiles
+ */
+function unZip() {
+  const folder = DriveApp.getRootFolder();
+  const files = folder.getFiles();
+  while (files.hasNext()) {
+    let zip = files.next();
+    if (zip.getMimeType() == MimeType.ZIP) {
+      let unziped = Utilities.unzip(zip);
+      for (let file of unziped) {
+        folder.createFile(file);
+      }
+      zip.moveTo(destination)
+    }
+  }
+}
+
 
 const mailsSidebar = new mySidebar("GMail", generateMailsSidebarJSON_)
 const driveSidebar = new mySidebar("Google Drive", generateDriveSidebarJSON_)
@@ -324,6 +346,7 @@ function onOpen() {
     .createMenu("Дополнительно")
     .addItem("GMail", "mailsSidebar.show")
     .addItem("Google Drive", "driveSidebar.show")
+    .addItem("unZip", "unZip")
     .addToUi();
   // https://developers.google.com/apps-script/reference/base/ui#createmenucaption
   // https://developers.google.com/apps-script/reference/base/ui#createaddonmenu
@@ -331,8 +354,9 @@ function onOpen() {
 
 /** TODO:
  * [+] #1. Добавить меню и сайдбар
- * [+] #2 Нужно список сообщений с датами выводить в сайдбар
+ * [+] #2. Нужно список сообщений с датами выводить в сайдбар
  * [+] #3. Добавить список файлов
+ * [+] #4. Получить разархивированные файлы
  * [-] Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
