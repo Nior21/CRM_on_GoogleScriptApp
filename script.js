@@ -329,9 +329,14 @@ function unZip() {
     if (zip.getMimeType() == MimeType.ZIP) {
       let unziped = Utilities.unzip(zip);
       for (let file of unziped) {
+        let name = file.getName();
+        let inc_date = file.getDateCreated();
+        let timeZone = Session.getScriptTimeZone();
+        let date = Utilities.formatDate(inc_date, timeZone, 'ddMMyyyyHHmmss');
+        file.setName(date + ' ' + name)
         folder.createFile(file);
       }
-      zip.moveTo(destination)
+      zip.setTrashed(true);
     }
   }
 }
@@ -357,7 +362,7 @@ function onOpen() {
  * [+] #2. Нужно список сообщений с датами выводить в сайдбар
  * [+] #3. Добавить список файлов
  * [+] #4. Получить разархивированные файлы
- * [-] Добавить дату выгрузки файлов в названия
+ * [-] #5. Добавить дату выгрузки файлов в названия
  * [-] Нужна проверка на наличие excel файла, если его нет то нужно получать и разархивировать архив
  * setTrashed(trashed)
  * [-] Автоматическая разархивация файла
