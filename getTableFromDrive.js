@@ -19,7 +19,7 @@ function getTableFromDrive() {
     const fileName = source.getName();
 
     for (let name of filesToImport) {
-      //if (fileName.includes(name)) Logger.log(fileName);
+      if (fileName.includes(name)) Logger.log(fileName);
     }
 
 
@@ -30,6 +30,6 @@ function getTableFromDrive() {
 /**
  * [+] Для каждого файла выделяем название
  * [+] Проверяем содержание названий из прописанной таблицы в реальном названии файла
- * [-] Если название обнаружено то возвращается имя файла
+ * [+] Если название обнаружено то возвращается имя файла
  * [-] Если в прошлом пункте все работает, то выгружаем содержимое документа в виде массива объектов
  */
