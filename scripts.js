@@ -1,6 +1,16 @@
 const SHEET_ID = '1PIUT5GSTyJxLZNByDY6bSTvgu7UzkXpqZkBBBMnefcM';
 const SHEET_NAME = 'Почта';
 
+const filesToImport = [
+  'Выдача наличных',
+  'Операция',
+  'Поступление (акты накладные УПД)',
+  'Поступление наличных',
+  'Реализация (акты накладные УПД)',
+  'Списание с расчетного счета',
+  'Счет покупателю'
+]
+
 //Gmail Advanced search https://support.google.com/mail/answer/7190
 const QUERY = "in:inbox after:2022/03/02"
 
@@ -203,7 +213,7 @@ function generateMailsSidebarJSON_() {
 
 
 function generateDriveSidebarJSON_() {
-    let files = getDriveFiles_();
+    let files = getFileListFromDrive();
 
     return [{
         type: "ul",
@@ -214,6 +224,15 @@ function generateDriveSidebarJSON_() {
 
 const mailsSidebar = new mySidebar("getGmails", generateMailsSidebarJSON_)
 const driveSidebar = new mySidebar("Google Drive", generateDriveSidebarJSON_)
+
+
+function run() {
+    getAttachments();
+    unZip();
+    convertToGSiute();
+    getTableFromDrive();
+}
+
 
 function onOpen() {
     // Создаём новый пункт меню
@@ -229,8 +248,3 @@ function onOpen() {
 }
 
 
-function run() {
-    getAttachments();
-    unZip();
-    convertToGSiute();
-}
